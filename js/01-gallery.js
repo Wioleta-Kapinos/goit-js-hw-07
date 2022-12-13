@@ -21,12 +21,22 @@ link.append(imageOfGallery);
 
 function selectImage(event) {
     event.preventDefault();
-    const instance = basicLightbox.create(`<img src="${event.target.getAttribute("data-source")}"></img>`);
-    instance.show();
-    document.addEventListener("keydown", function keyEscape(event) {
-        if (event.key === "Escape") {
-          instance.close();
-        }
-    });
+    if (event.target.nodeName !== "IMG") {
+      console.log("not img");
+      return;
+    }
+    const instance = basicLightbox.create(`<img src="${event.target.getAttribute("data-source")}"></img>`,
+    { onClose: () => { 
+      document.removeEventListener("keydown", escapeKey);
+    },
+  }); instance.show();
+  document.addEventListener("keydown", escapeKey);
+  function escapeKey(event) {
+    if (event.key === "Escape") {
+      instance.close();
+      document.removeEventListener("keydown", escapeKey);
+      return;
+    }
+  }
 }
 gallery.addEventListener("click", selectImage);
